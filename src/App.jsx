@@ -1,10 +1,25 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Fetch data from public API
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/posts?_limit=5")
+      .then((res) => res.json())
+      .then((data) => {
+        setPosts(data)
+        setLoading(false)
+      })
+      .catch((err) => {
+        console.error("Error fetching posts:", err)
+        setLoading(false)
+      })
+  }, [])
 
   return (
     <>
@@ -16,18 +31,23 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React</h1>
+      <h1>Vite + React API Demo</h1>
+
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+        <h2>Latest Posts</h2>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <ul>
+            {posts.map((post) => (
+              <li key={post.id}>
+                <strong>{post.title}</strong>
+                <p>{post.body}</p>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
